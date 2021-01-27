@@ -3,6 +3,7 @@ const redux = require("redux");
 
 const createStore = redux.createStore; //store is created
 const combineReducers = redux.combineReducers; // combine reducer is created form multiple reducer
+const applyMiddleware = redux.applyMiddleware; // middle ware is define
 
 const Buy_Laptop = "Buy_Laptop"; // action type is define
 const Buy_Camera = "Buy_Camera";
@@ -62,13 +63,25 @@ const cameraReducer = (state = initialStateCamera, action) => {
   }
 };
 
+//multiple reducer passed as argument
 const Reducer = combineReducers({
   laptop: laptopReducer,
   camera: cameraReducer
 });
 
+//applyMiddleware for capturing log
+const logger = store => {
+  return next => {
+    return action => {
+      const result = next(action);
+      console.log("middleware log",result);
+      return result;
+    }
+  }
+}
+
 //calling a store
-const store = createStore(Reducer);
+const store = createStore(Reducer, applyMiddleware(logger));
 console.log("Initial State", store.getState());
 const unsubscribe = store.subscribe(() =>
   console.log("Updated state Value", store.getState())
